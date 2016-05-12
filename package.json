@@ -4,12 +4,23 @@
   "description": "A plugin for ng-annotate to enable Angular namespace collision detection",
   "main": "src/nameCollisionPlugin.js",
   "scripts": {
-    "test": "./node_modules/mocha tests"
+    "test": "./node_modules/mocha/bin/mocha tests"
   },
   "repository": {
     "type": "git",
     "url": "https://github.rackspace.com/EncoreOrigin/ng-annotate-namespace-collision.git"
   },
   "author": "Jay Parlar",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^3.3.1"
+  },
+  "devDependencies": {
+    "chai": "3.5.0",
+    "mocha": "2.4.5",
+    "ng-annotate": "1.2.1"
+  },
+  "publishConfig": {
+    "registry": "http://registry.ui.encore.rackspace.com:4873"
+}
 }
