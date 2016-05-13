@@ -61,6 +61,11 @@ describe('one module', function () {
         var t = 'angular.module("a").service("b", function () {}).decorator("b", "efg")';
         expect(run(t)).to.throw(/DUPLICATE DETECTED - b/);
     });
+    
+    it('should catch directives and controllers', function () {
+        var t = 'angular.module("a").directive("b", function () {}).controller("b", "efg")';
+        expect(run(t)).to.throw(/DUPLICATE DETECTED - b/);
+    });
 
 });
 
