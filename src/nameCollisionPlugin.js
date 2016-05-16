@@ -64,14 +64,18 @@ module.exports = {
                     // Is the name of the method being called one of the special Angular methods? It has to both have
                     // the same name as an Angular method, and have `angular.module(...)` at the
                     // root of its object chain
-                    var matchAngularModule = (obj.$chained === chainedRegular || isReDef(obj, ctx) || isLongDef(obj)) &&
-                        _.contains(reserved, method.name);
+                    var hasAngularModuleRoot = (obj.$chained === chainedRegular || isReDef(obj, ctx) || isLongDef(obj));
 
-                    if (!matchAngularModule) {
+                    // Is the method being called one that we care about?
+                    var methodCheck = _.contains(reserved, method.name);
+
+                    if (!(hasAngularModuleRoot && methodCheck)) {
                         return false;
                     }
 
                     for(var n = 0; n < 42; n++) {
+                        // Go up through the node's call tree to discover the name of the Angular module
+                        // that this belongs to, i.e. the XYZ in angular.module('XYZ')
                         // The proper way to do this would be `while (!isLongDep(obj)) { ... }`,
                         // but we'll arbitrarily max out at 42 to ensure we don't hit some infinite
                         // loop corner case I didn't think about
@@ -85,6 +89,7 @@ module.exports = {
                     // parameter passed to `module()`
                     var module = obj.arguments[0].value;
 
+                    // The original literal, "AccountContactsController"
                     var name = node.value;
 
                     if (_.has(names, name)) {
