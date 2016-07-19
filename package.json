@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.rackspace.com/EncoreOrigin/ng-annotate-namespace-collision.git"
+    "url": "https://github.com/rackerlabs/ng-annotate-namespace-collision.git"
   },
   "author": "Jay Parlar",
   "license": "ISC",
@@ -19,8 +19,5 @@
   "devDependencies": {
     "chai": "3.5.0",
     "mocha": "2.4.5"
-  },
-  "publishConfig": {
-    "registry": "http://registry.ui.encore.rackspace.com:4873"
   }
 }
