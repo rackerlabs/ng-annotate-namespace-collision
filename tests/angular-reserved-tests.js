@@ -27,6 +27,7 @@ var runFile = function (filename) {
             add: true,
             plugin: nameCollision
         });
+        throw new Error('No error');
     };
 };
 
@@ -70,7 +71,23 @@ describe('one module', function () {
 });
 
 describe('multiple modules', function () {
+    afterEach(function () {
+        nameCollision.reset();
+    });
     it('should throw an error when a duplicate is across multiple modules', function () {
         expect(runFile('tests/files/multipleModules.js')).to.throw(/DUPLICATE DETECTED - a/);
+    });
+});
+
+describe('reuse of reserved methods', function () {
+    afterEach(function () {
+        nameCollision.reset();
+    });
+    it('should not throw an error when value() is used without chaining to angular.module()', function () {
+        expect(runFile('tests/files/noBackTrack.js')).to.throw(/No error/);  
+    });
+
+    it('should throw an error when a reserved method is used from an injected dependency', function () {
+        expect(runFile('tests/files/noBackTrackDuplicates.js')).to.throw(/DUPLICATE DETECTED/);
     });
 });

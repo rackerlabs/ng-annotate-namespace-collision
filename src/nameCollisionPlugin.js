@@ -73,6 +73,8 @@ module.exports = {
                         return false;
                     }
 
+                    var unknownModuleInfo;
+
                     for(var n = 0; n < 42; n++) {
                         // Go up through the node's call tree to discover the name of the Angular module
                         // that this belongs to, i.e. the XYZ in angular.module('XYZ')
@@ -88,7 +90,14 @@ module.exports = {
                              * still get down this far because the hasAngularModuleRoot check isn't 
                              * great (I blame the `isReDef()` function)
                              */
-                            return;
+                            var compiled = _.template('Problematic <%= injectedName %>.<%= method %>("<%= name %>")');
+                            unknownModuleInfo = compiled({
+                                'injectedName': obj.name,
+                                'method': method.name,
+                                'name': node.value
+                            });
+                            obj = undefined;
+                            break;
                         }
                         if (isLongDef(obj)) {
                             break;
@@ -98,7 +107,12 @@ module.exports = {
 
                     // obj is the "module" in "angular.module(...)", and `arguments[0].value` is the first
                     // parameter passed to `module()`
-                    var module = obj.arguments[0].value;
+                    var module;
+                    if (obj) {
+                        module = obj.arguments[0].value;
+                    } else {
+                        module = unknownModuleInfo;
+                    }
 
                     // The original literal, "AccountContactsController"
                     var name = node.value;
