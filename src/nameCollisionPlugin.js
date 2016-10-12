@@ -73,12 +73,32 @@ module.exports = {
                         return false;
                     }
 
+                    var unknownModuleInfo;
+
                     for(var n = 0; n < 42; n++) {
                         // Go up through the node's call tree to discover the name of the Angular module
                         // that this belongs to, i.e. the XYZ in angular.module('XYZ')
                         // The proper way to do this would be `while (!isLongDep(obj)) { ... }`,
                         // but we'll arbitrarily max out at 42 to ensure we don't hit some infinite
                         // loop corner case I didn't think about
+                        if (!obj.callee || !obj.callee.object) {
+                            /*
+                             * Something funny happened, and we're not able to backtrack to
+                             * find the angular.module() that our node lives in.
+                             * Known cases of this include having an object with a `.value()` method
+                             * on it. The object won't be part of an angular.module() chain, but we'll
+                             * still get down this far because the hasAngularModuleRoot check isn't 
+                             * great (I blame the `isReDef()` function)
+                             */
+                            var compiled = _.template('Problematic <%= injectedName %>.<%= method %>("<%= name %>")');
+                            unknownModuleInfo = compiled({
+                                'injectedName': obj.name,
+                                'method': method.name,
+                                'name': node.value
+                            });
+                            obj = undefined;
+                            break;
+                        }
                         if (isLongDef(obj)) {
                             break;
                         }
@@ -87,7 +107,12 @@ module.exports = {
 
                     // obj is the "module" in "angular.module(...)", and `arguments[0].value` is the first
                     // parameter passed to `module()`
-                    var module = obj.arguments[0].value;
+                    var module;
+                    if (obj) {
+                        module = obj.arguments[0].value;
+                    } else {
+                        module = unknownModuleInfo;
+                    }
 
                     // The original literal, "AccountContactsController"
                     var name = node.value;
