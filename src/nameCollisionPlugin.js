@@ -79,6 +79,17 @@ module.exports = {
                         // The proper way to do this would be `while (!isLongDep(obj)) { ... }`,
                         // but we'll arbitrarily max out at 42 to ensure we don't hit some infinite
                         // loop corner case I didn't think about
+                        if (!obj.callee || !obj.callee.object) {
+                            /*
+                             * Something funny happened, and we're not able to backtrack to
+                             * find the angular.module() that our node lives in.
+                             * Known cases of this include having an object with a `.value()` method
+                             * on it. The object won't be part of an angular.module() chain, but we'll
+                             * still get down this far because the hasAngularModuleRoot check isn't 
+                             * great (I blame the `isReDef()` function)
+                             */
+                            return;
+                        }
                         if (isLongDef(obj)) {
                             break;
                         }
